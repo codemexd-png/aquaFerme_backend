@@ -1,5 +1,16 @@
-// Ce script insère des données de test dans toutes les tables.
-// Lance-le une seule fois avec : node src/seed.js
+// Ce script insère des données de test réalistes dans toutes les tables de la base.
+// À lancer UNE SEULE FOIS après avoir créé les tables avec schema.sql.
+// Commande : node src/seed.js
+//
+// Ce script crée :
+//   - 3 utilisateurs : ibrahim (admin), grace (manager), lyly (manager)
+//   - 5 étangs      : A1, A2, B1, B2, Barrage
+//   - 8 opérations poissons (le trigger met à jour current_fish_count automatiquement)
+//   - 10 relevés de qualité de l'eau
+//   - 10 tâches (8 pending, 2 completed)
+//
+// Mot de passe pour tous les utilisateurs : projet_ecole_stage
+// Les mots de passe sont hashés avec bcrypt avant d'être stockés en base.
 
 const pool = require('./config/db');
 const bcrypt = require('bcrypt');

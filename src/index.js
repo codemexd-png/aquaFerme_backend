@@ -10,6 +10,7 @@ require('dotenv').config();
 
 // On importe les routes d'authentification qu'on va créer après
 const authRoutes = require('./routes/auth.routes');
+// Routes ajoutées par Lyly — opérations poissons, qualité de l'eau, tâches
 const fishOperationRoutes = require('./routes/fishOperation.routes');
 const waterQualityRoutes = require('./routes/waterQuality.routes');
 const taskRoutes = require('./routes/task.routes');
@@ -27,9 +28,10 @@ app.use(express.json());
 // On branche les routes auth sur le préfixe /auth
 // Donc POST /auth/login, GET /auth/me etc. seront gérés par authRoutes
 app.use('/auth', authRoutes);
-app.use('/fish-operations', fishOperationRoutes);
-app.use('/water-quality', waterQualityRoutes);
-app.use('/tasks', taskRoutes);
+// Routes de Lyly — branchées sur leurs préfixes respectifs
+app.use('/fish-operations', fishOperationRoutes); // POST et GET /fish-operations
+app.use('/water-quality', waterQualityRoutes);   // POST et GET /water-quality
+app.use('/tasks', taskRoutes);                   // POST, GET, PATCH /tasks
 
 // On récupère le port depuis .env, ou 3000 par défaut
 const PORT = process.env.PORT || 3000;

@@ -1,3 +1,13 @@
+// Ce fichier contient la logique métier pour la gestion des tâches (planning).
+// Il gère trois fonctions :
+//   - addTask          : créer une nouvelle tâche
+//   - getTasks         : lister les tâches avec filtres optionnels (date, user_id)
+//   - updateTaskStatus : marquer une tâche comme 'completed' ou 'pending'
+//
+// Priorités possibles : 'haute', 'moyenne', 'basse'
+// Statuts possibles   : 'pending' (en attente), 'completed' (terminée)
+// pond_id est optionnel : une tâche peut ne pas être liée à un étang spécifique.
+
 const pool = require('../config/db');
 
 // Crée une nouvelle tâche dans le planning.
@@ -5,7 +15,8 @@ const addTask = async (req, res) => {
     const { pond_id, title, description, priority, task_date } = req.body;
     const user_id = req.user.id;
 
-    // Validation des champs obligatoires
+    // title, priority et task_date sont obligatoires
+    // pond_id et description sont optionnels
     if (!title || !priority || !task_date) {
         return res.status(400).json({ error: 'Les champs title, priority et task_date sont obligatoires' });
     }
@@ -25,12 +36,18 @@ const addTask = async (req, res) => {
     }
 };
 
-// Retourne les tâches avec filtres optionnels : ?date=2026-05-23 et/ou ?user_id=1.
-// Sans filtre, retourne toutes les tâches triées par date.
+// Retourne les tâches avec filtres optionnels.
+// Exemples d'appels :
+//   GET /tasks                          → toutes les tâches
+//   GET /tasks?date=2026-05-23          → tâches d'un jour précis
+//   GET /tasks?user_id=1               → tâches d'un utilisateur
+//   GET /tasks?date=2026-05-23&user_id=1 → combinaison des deux filtres
+// Résultats triés par date puis priorité.
 const getTasks = async (req, res) => {
     const { date, user_id } = req.query;
 
-    // On construit la requête dynamiquement selon les filtres fournis
+    // On construit la requête dynamiquement pour éviter d'écrire plusieurs versions de la même requête.
+    // On ajoute des conditions selon les paramètres reçus.
     const conditions = [];
     const params = [];
 
@@ -60,6 +77,8 @@ const getTasks = async (req, res) => {
 };
 
 // Met à jour le statut d'une tâche (pending → completed ou l'inverse).
+// PATCH /tasks/:id/status — on n'envoie que le statut, pas toute la tâche.
+// updated_at est mis à jour automatiquement avec NOW().
 const updateTaskStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
