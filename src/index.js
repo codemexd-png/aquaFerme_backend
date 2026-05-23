@@ -10,6 +10,9 @@ require('dotenv').config();
 
 // On importe les routes d'authentification qu'on va créer après
 const authRoutes = require('./routes/auth.routes');
+const fishOperationRoutes = require('./routes/fishOperation.routes');
+const waterQualityRoutes = require('./routes/waterQuality.routes');
+const taskRoutes = require('./routes/task.routes');
 
 // On crée l'application Express
 const app = express();
@@ -24,6 +27,9 @@ app.use(express.json());
 // On branche les routes auth sur le préfixe /auth
 // Donc POST /auth/login, GET /auth/me etc. seront gérés par authRoutes
 app.use('/auth', authRoutes);
+app.use('/fish-operations', fishOperationRoutes);
+app.use('/water-quality', waterQualityRoutes);
+app.use('/tasks', taskRoutes);
 
 // On récupère le port depuis .env, ou 3000 par défaut
 const PORT = process.env.PORT || 3000;
