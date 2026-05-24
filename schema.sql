@@ -18,6 +18,37 @@ CREATE TABLE IF NOT EXISTS ponds (
     current_fish_count INTEGER DEFAULT 0
 );
 
+INSERT INTO ponds (name, pond_group, area_m2, max_capacity, current_fish_count)
+VALUES
+-- Étangs A : 900 m², capacité 2250
+('A1', 'A', 900, 2250, 1800),
+('A2', 'A', 900, 2250, 2100),
+('A3', 'A', 900, 2250, 1500),
+('A4', 'A', 900, 2250, 0),
+('A5', 'A', 900, 2250, 0),
+('A6', 'A', 900, 2250, 0),
+('A7', 'A', 900, 2250, 0),
+
+-- Étangs B : 600 m², capacité 1500
+('B1', 'B', 600, 1500, 1200),
+('B2', 'B', 600, 1500, 0),
+('B3', 'B', 600, 1500, 0),
+('B4', 'B', 600, 1500, 0),
+('B5', 'B', 600, 1500, 0),
+
+-- Étangs C : 150 m², capacité 375
+('C1', 'C', 150, 375, 300),
+('C2', 'C', 150, 375, 0),
+('C3', 'C', 150, 375, 0),
+
+-- Étangs D : 400 m², capacité 1000
+('D1', 'D', 400, 1000, 0),
+('D2', 'D', 400, 1000, 0),
+
+-- Barrage
+('Barrage principal', 'Barrage', 50000, 50000, 5000)
+ON CONFLICT DO NOTHING;
+
 -- Table des opérations sur les poissons
 CREATE TABLE IF NOT EXISTS fish_operations (
     id SERIAL PRIMARY KEY,

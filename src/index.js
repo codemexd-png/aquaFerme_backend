@@ -5,6 +5,9 @@ const express = require('express');
 // sans être bloqué par le navigateur (Cross-Origin Resource Sharing)
 const cors = require('cors');
 
+// Import des routes des étangs
+const pondRoutes = require("./routes/pond.routes");
+
 // On charge les variables du fichier .env dans process.env
 require('dotenv').config();
 
@@ -25,8 +28,15 @@ app.use(express.json());
 // Donc POST /auth/login, GET /auth/me etc. seront gérés par authRoutes
 app.use('/auth', authRoutes);
 
+// Routes des étangs
+app.use("/ponds", pondRoutes);
+
 // On récupère le port depuis .env, ou 3000 par défaut
 const PORT = process.env.PORT || 3000;
+
+app.get("/", (req, res) => {
+  res.send("API AquaTrack fonctionne");
+});
 
 // On démarre le serveur et on affiche un message de confirmation
 app.listen(PORT, () => {
