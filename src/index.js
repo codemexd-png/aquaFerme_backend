@@ -17,6 +17,8 @@ const authRoutes = require('./routes/auth.routes');
 const fishOperationRoutes = require('./routes/fishOperation.routes');
 const waterQualityRoutes = require('./routes/waterQuality.routes');
 const taskRoutes = require('./routes/task.routes');
+const usersRoutes = require('./routes/users.routes');
+const feedStockRoutes = require('./routes/feed_stock.routes');
 
 // On crée l'application Express
 const app = express();
@@ -38,6 +40,11 @@ app.use('/tasks', taskRoutes);                   // POST, GET, PATCH /tasks
 
 // Routes des étangs
 app.use("/ponds", pondRoutes);
+
+// Routes des utilisateurs — protégées par auth middleware
+app.use('/users', usersRoutes);
+// Routes du stock d'aliments — protégées par auth middleware
+app.use('/feed-stock', feedStockRoutes);
 
 // On récupère le port depuis .env, ou 3000 par défaut
 const PORT = process.env.PORT || 3000;
