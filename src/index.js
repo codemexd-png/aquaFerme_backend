@@ -8,6 +8,8 @@ const cors = require('cors');
 // Import des routes des étangs
 const pondRoutes = require("./routes/pond.routes");
 
+const userRoutes = require("./routes/user.routes");
+
 // On charge les variables du fichier .env dans process.env
 require('dotenv').config();
 
@@ -41,10 +43,7 @@ app.use('/tasks', taskRoutes);                   // POST, GET, PATCH /tasks
 // Routes des étangs
 app.use("/ponds", pondRoutes);
 
-// Routes des utilisateurs — protégées par auth middleware
-app.use('/users', usersRoutes);
-// Routes du stock d'aliments — protégées par auth middleware
-app.use('/feed-stock', feedStockRoutes);
+app.use("/users", userRoutes);
 
 // On récupère le port depuis .env, ou 3000 par défaut
 const PORT = process.env.PORT || 3000;
