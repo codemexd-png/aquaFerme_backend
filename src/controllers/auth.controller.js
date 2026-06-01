@@ -19,9 +19,23 @@ const login = async (req, res) => {
 
         // On vérifie si l'utilisateur existe et si le mot de passe est correct
         if (user && await bcrypt.compare(password, user.password_hash)) {
-            // On génère un token JWT
-            const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, process.env.JWT_SECRET, { expiresIn: '24h' });
-            res.json({ token });
+            const userInfo = {
+                id: user.id,
+                username: user.username,
+                name: user.name || user.username,
+                role: user.role
+            };
+
+            const token = jwt.sign(
+                userInfo,
+                process.env.JWT_SECRET,
+                { expiresIn: '24h' }
+            );
+
+            res.json({
+                token,
+                user: userInfo
+            });
         } else {
             res.status(401).json({ error: 'Identifiants invalides' });
         }
