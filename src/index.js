@@ -8,6 +8,8 @@ const cors = require('cors');
 // Import des routes des étangs
 const pondRoutes = require("./routes/pond.routes");
 
+const userRoutes = require("./routes/user.routes");
+
 // On charge les variables du fichier .env dans process.env
 require('dotenv').config();
 
@@ -17,6 +19,8 @@ const authRoutes = require('./routes/auth.routes');
 const fishOperationRoutes = require('./routes/fishOperation.routes');
 const waterQualityRoutes = require('./routes/waterQuality.routes');
 const taskRoutes = require('./routes/task.routes');
+const usersRoutes = require('./routes/users.routes');
+const feedStockRoutes = require('./routes/feed_stock.routes');
 
 // On crée l'application Express
 const app = express();
@@ -38,6 +42,8 @@ app.use('/tasks', taskRoutes);                   // POST, GET, PATCH /tasks
 
 // Routes des étangs
 app.use("/ponds", pondRoutes);
+
+app.use("/users", userRoutes);
 
 // On récupère le port depuis .env, ou 3000 par défaut
 const PORT = process.env.PORT || 3000;
