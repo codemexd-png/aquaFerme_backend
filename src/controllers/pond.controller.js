@@ -136,3 +136,25 @@ exports.getPondStats = async (req, res) => {
     });
   }
 };
+
+exports.updateDailyFeed = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { food_given_kg, food_planned_kg } = req.body;
+
+    const result = await pool.query(
+      `INSERT INTO daily_feed (pond_id, feed_date, food_given_kg, food_planned_kg)
+       VALUES ($1, CURRENT_DATE, $2, $3)
+       ON CONFLICT (pond_id, feed_date)
+       DO UPDATE SET 
+         food_given_kg = $2,
+         food_planned_kg = $3
+       RETURNING *`,
+      [id, food_given_kg, food_planned_kg],
+    );
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur", error: error.message });
+  }
+};

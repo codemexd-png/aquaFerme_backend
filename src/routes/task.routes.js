@@ -9,14 +9,16 @@
 //   GET   /tasks?user_id=...    → filtrer par utilisateur
 //   PATCH /tasks/:id/status     → mettre à jour le statut (pending/completed)
 
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const taskController = require('../controllers/task.controller');
-const verifyToken = require('../middleware/auth.middleware');
+const taskController = require("../controllers/task.controller");
+const verifyToken = require("../middleware/auth.middleware");
 
 // verifyToken s'exécute avant le controller : si le token est invalide, la requête est bloquée
-router.post('/', verifyToken, taskController.addTask);
-router.get('/', verifyToken, taskController.getTasks);
-router.patch('/:id/status', verifyToken, taskController.updateTaskStatus);
+router.post("/", verifyToken, taskController.addTask);
+router.get("/", verifyToken, taskController.getTasks);
+router.patch("/:id/status", verifyToken, taskController.updateTaskStatus);
+// POST /ponds/:id/feed — saisir la consommation journalière
+
 
 module.exports = router;
