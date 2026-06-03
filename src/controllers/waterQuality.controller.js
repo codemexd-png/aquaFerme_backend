@@ -41,15 +41,15 @@ const addMeasurement = async (req, res) => {
 const getMeasurements = async (req, res) => {
     const { pond_id } = req.query;
 
-    if (!pond_id) {
-        return res.status(400).json({ error: 'Le paramètre pond_id est obligatoire' });
-    }
-
     try {
-        const result = await pool.query(
-            `SELECT * FROM water_quality WHERE pond_id = $1 ORDER BY measurement_date DESC`,
-            [pond_id]
-        );
+        const result = pond_id
+            ? await pool.query(
+                `SELECT * FROM water_quality WHERE pond_id = $1 ORDER BY measurement_date DESC`,
+                [pond_id]
+              )
+            : await pool.query(
+                `SELECT * FROM water_quality ORDER BY measurement_date DESC LIMIT 50`
+              );
 
         res.json({ measurements: result.rows });
     } catch (error) {

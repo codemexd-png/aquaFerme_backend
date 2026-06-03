@@ -158,3 +158,21 @@ exports.updateDailyFeed = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur", error: error.message });
   }
 };
+
+exports.getDashboardStats = async (req, res) => {
+  try {
+    const stats = await pool.query(`
+      SELECT
+        COALESCE(SUM(CASE WHEN pond_group != 'Barrage' THEN current_fish_count ELSE 0 END), 0) AS total_fish,
+        COUNT(CASE WHEN pond_group != 'Barrage' THEN 1 END) AS total_ponds,
+        COUNT(CASE WHEN pond_group != 'Barrage' AND current_fish_count > 0 THEN 1 END) AS active_ponds,
+        ROUND(AVG(CASE WHEN pond_group != 'Barrage' AND max_capacity > 0 
+          THEN (current_fish_count::float / max_capacity * 100) END)::numeric, 1) AS avg_occupation,
+        COALESCE(SUM(CASE WHEN pond_group = 'Barrage' THEN current_fish_count ELSE 0 END), 0) AS barrage_fish
+      FROM ponds
+    `);
+    res.json(stats.rows[0]);
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur", error: error.message });
+  }
+};

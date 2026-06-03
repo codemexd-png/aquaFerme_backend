@@ -6,21 +6,10 @@ const pondController = require("../controllers/pond.controller");
 // Middleware JWT
 const verifyToken = require("../middleware/auth.middleware");
 
-// =========================
-// GET /ponds
-// =========================
 router.get("/", verifyToken, pondController.getAllPonds);
-
-// =========================
-// GET /ponds/:id
-// =========================
+router.get("/dashboard-stats", verifyToken, pondController.getDashboardStats);
 router.get("/:id", verifyToken, pondController.getPondById);
-
-// =========================
-// GET /ponds/:id/stats
-// =========================
 router.get("/:id/stats", verifyToken, pondController.getPondStats);
-
 router.post("/:id/feed", verifyToken, pondController.updateDailyFeed);
 
 module.exports = router;

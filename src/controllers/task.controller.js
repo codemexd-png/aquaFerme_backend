@@ -12,7 +12,8 @@ const pool = require("../config/db");
 
 // Crée une nouvelle tâche dans le planning.
 const addTask = async (req, res) => {
-  const { pond_id, title, description, priority, task_date } = req.body;
+  const { pond_id, title, description, priority, task_date, assigned_to } =
+    req.body;
   const user_id = req.user.id;
 
   // title, priority et task_date sont obligatoires
@@ -25,7 +26,7 @@ const addTask = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `INSERT INTO tasks (user_id, pond_id, title, description, priority, task_date)
+      `INSERT INTO tasks (user_id, pond_id, title, description, priority, task_date, assigned_to)
              VALUES ($1, $2, $3, $4, $5, $6)
              RETURNING *`,
       [
@@ -35,6 +36,7 @@ const addTask = async (req, res) => {
         description || null,
         priority,
         task_date,
+        assigned_to || null,
       ],
     );
 
