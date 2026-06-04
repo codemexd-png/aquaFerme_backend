@@ -1,9 +1,11 @@
-const express = require("express");
+﻿const express = require("express");
 const router = express.Router();
 const usersController = require("../controllers/users.controller");
 const verifyToken = require("../middleware/auth.middleware");
 
-// Route pour récupérer tous les utilisateurs 
 router.get("/", verifyToken, usersController.getUsers);
+router.post("/", verifyToken, usersController.createUser);
+router.patch("/:id", verifyToken, usersController.updateUser);
+router.delete("/:id", verifyToken, usersController.deleteUser);
 
 module.exports = router;
