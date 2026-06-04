@@ -22,6 +22,8 @@ const feedStockRoutes = require("./routes/feed_stock.routes");
 const statisticsRoutes = require("./routes/statistics.routes");
 const notificationRoutes = require("./routes/notification.routes");
 
+
+
 // On crée l'application Express
 const app = express();
 
@@ -38,7 +40,6 @@ app.use("/auth", authRoutes);
 // Routes de Lyly — branchées sur leurs préfixes respectifs
 app.use("/fish-operations", fishOperationRoutes); // POST et GET /fish-operations
 app.use("/water-quality", waterQualityRoutes); // POST et GET /water-quality
-app.use("/tasks", taskRoutes); // POST, GET, PATCH /tasks
 
 // Routes des étangs
 app.use("/ponds", pondRoutes);

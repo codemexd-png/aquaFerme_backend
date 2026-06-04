@@ -24,6 +24,53 @@ const getUsers = async (req, res) => {
   }
 };
 
+const bcrypt = require("bcryptjs");
+
+// Créer un utilisateur
+const createUser = async (req, res) => {
+  try {
+    const { username, password, role } = req.body;
+
+    if (!username || !password || !role) {
+      return res.status(400).json({
+        error: "username, password et role sont obligatoires",
+      });
+    }
+
+    const existingUser = await pool.query(
+      "SELECT id FROM users WHERE username = $1",
+      [username]
+    );
+
+    if (existingUser.rows.length > 0) {
+      return res.status(400).json({
+        error: "Cet utilisateur existe déjà",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const result = await pool.query(
+      `
+      INSERT INTO users (username, password_hash, role)
+      VALUES ($1, $2, $3)
+      RETURNING
+        id,
+        username,
+        username AS "fullName",
+        role,
+        is_active AS "isActive"
+      `,
+      [username, hashedPassword, role]
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error("Erreur création utilisateur :", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+};
+
 const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -63,5 +110,5 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { getUsers, updateUser, deleteUser };
+module.exports = { getUsers, createUser, updateUser, deleteUser };
 
