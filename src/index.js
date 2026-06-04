@@ -19,6 +19,7 @@ const waterQualityRoutes = require("./routes/waterQuality.routes");
 const taskRoutes = require("./routes/task.routes");
 const usersRoutes = require("./routes/users.routes");
 const feedStockRoutes = require("./routes/feed_stock.routes");
+const statisticsRoutes = require("./routes/statistics.routes");
 
 // On crée l'application Express
 const app = express();
@@ -43,9 +44,12 @@ app.use("/ponds", pondRoutes);
 
 app.use("/feed-stock", feedStockRoutes);
 app.use("/users", usersRoutes);
+app.use("/statistics", statisticsRoutes);
 
 // On récupère le port depuis .env, ou 3000 par défaut
 const PORT = process.env.PORT || 3000;
+
+
 
 app.get("/", (req, res) => {
   res.send("API AquaTrack fonctionne");

@@ -158,3 +158,140 @@ exports.updateDailyFeed = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur", error: error.message });
   }
 };
+
+// =========================
+// POST /ponds
+// Créer un nouvel étang
+// =========================
+exports.createPond = async (req, res) => {
+  try {
+    const {
+      name,
+      pond_group,
+      pondGroup,
+      area_m2,
+      areaM2,
+      max_capacity,
+      maxCapacity,
+      current_fish_count,
+      currentFishCount,
+    } = req.body;
+
+    const finalGroup = pond_group || pondGroup;
+    const finalArea = area_m2 || areaM2;
+    const finalCapacity = max_capacity || maxCapacity;
+    const finalFishCount = current_fish_count || currentFishCount || 0;
+
+    if (!name || !finalGroup || !finalArea || !finalCapacity) {
+      return res.status(400).json({
+        message: "Nom, groupe, surface et capacité obligatoires",
+      });
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO ponds 
+        (name, pond_group, area_m2, max_capacity, current_fish_count)
+      VALUES 
+        ($1, $2, $3, $4, $5)
+      RETURNING *
+      `,
+      [name, finalGroup, finalArea, finalCapacity, finalFishCount]
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({
+      message: "Erreur création étang",
+      error: error.message,
+    });
+  }
+};
+
+// =========================
+// PATCH /ponds/:id
+// Modifier un étang
+// =========================
+exports.updatePond = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const {
+      name,
+      pond_group,
+      pondGroup,
+      area_m2,
+      areaM2,
+      max_capacity,
+      maxCapacity,
+      current_fish_count,
+      currentFishCount,
+    } = req.body;
+
+    const result = await pool.query(
+      `
+      UPDATE ponds
+      SET
+        name = COALESCE($1, name),
+        pond_group = COALESCE($2, pond_group),
+        area_m2 = COALESCE($3, area_m2),
+        max_capacity = COALESCE($4, max_capacity),
+        current_fish_count = COALESCE($5, current_fish_count)
+      WHERE id = $6
+      RETURNING *
+      `,
+      [
+        name,
+        pond_group || pondGroup,
+        area_m2 || areaM2,
+        max_capacity || maxCapacity,
+        current_fish_count || currentFishCount,
+        id,
+      ]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: "Étang introuvable",
+      });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({
+      message: "Erreur modification étang",
+      error: error.message,
+    });
+  }
+};
+
+// =========================
+// DELETE /ponds/:id
+// Supprimer un étang
+// =========================
+exports.deletePond = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(
+      "DELETE FROM ponds WHERE id = $1 RETURNING *",
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: "Étang introuvable",
+      });
+    }
+
+    res.json({
+      message: "Étang supprimé avec succès",
+      pond: result.rows[0],
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Erreur suppression étang",
+      error: error.message,
+    });
+  }
+};

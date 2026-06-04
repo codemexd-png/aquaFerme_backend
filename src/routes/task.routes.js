@@ -20,5 +20,7 @@ router.get("/", verifyToken, taskController.getTasks);
 router.patch("/:id/status", verifyToken, taskController.updateTaskStatus);
 // POST /ponds/:id/feed — saisir la consommation journalière
 
+router.patch("/:id", verifyToken, taskController.updateTask);
+router.delete("/:id", verifyToken, taskController.deleteTask);
 
 module.exports = router;

@@ -15,4 +15,7 @@ const verifyToken = require('../middleware/auth.middleware');
 router.post('/', verifyToken, waterQualityController.addMeasurement);
 router.get('/', verifyToken, waterQualityController.getMeasurements);
 
+router.patch("/:id", verifyToken, waterQualityController.updateMeasurement);
+router.delete("/:id", verifyToken, waterQualityController.deleteMeasurement);
+
 module.exports = router;

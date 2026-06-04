@@ -16,4 +16,7 @@ const verifyToken = require('../middleware/auth.middleware');
 router.post('/', verifyToken, fishOperationController.addOperation);
 router.get('/', verifyToken, fishOperationController.getOperations);
 
+router.patch("/:id", verifyToken, fishOperationController.updateOperation);
+router.delete("/:id", verifyToken, fishOperationController.deleteOperation);
+
 module.exports = router;

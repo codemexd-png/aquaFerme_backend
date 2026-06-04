@@ -23,4 +23,8 @@ router.get("/:id/stats", verifyToken, pondController.getPondStats);
 
 router.post("/:id/feed", verifyToken, pondController.updateDailyFeed);
 
+router.post("/", verifyToken, pondController.createPond);
+router.patch("/:id", verifyToken, pondController.updatePond);
+router.delete("/:id", verifyToken, pondController.deletePond);
+
 module.exports = router;

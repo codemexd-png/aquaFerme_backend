@@ -12,7 +12,7 @@ const pool = require("../config/db");
 
 // Crée une nouvelle tâche dans le planning.
 const addTask = async (req, res) => {
-  const { pond_id, title, description, priority, task_date } = req.body;
+  const { pond_id, assigned_to, title, description, priority, task_date } = req.body;
   const user_id = req.user.id;
 
   // title, priority et task_date sont obligatoires
@@ -25,17 +25,18 @@ const addTask = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `INSERT INTO tasks (user_id, pond_id, title, description, priority, task_date)
-             VALUES ($1, $2, $3, $4, $5, $6)
-             RETURNING *`,
+      `INSERT INTO tasks (user_id, assigned_to, pond_id, title, description, priority, task_date)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING *`,
       [
         user_id,
+        assigned_to || null,
         pond_id || null,
         title,
         description || null,
         priority,
         task_date,
-      ],
+      ]
     );
 
     res.status(201).json({ task: result.rows[0] });
@@ -123,4 +124,81 @@ const updateTaskStatus = async (req, res) => {
   }
 };
 
-module.exports = { addTask, getTasks, updateTaskStatus };
+const updateTask = async (req, res) => {
+  const { id } = req.params;
+  const {
+    pond_id,
+    title,
+    description,
+    priority,
+    task_date,
+    status,
+  } = req.body;
+
+  try {
+    const result = await pool.query(
+      `
+      UPDATE tasks
+      SET
+        pond_id = COALESCE($1, pond_id),
+        title = COALESCE($2, title),
+        description = COALESCE($3, description),
+        priority = COALESCE($4, priority),
+        task_date = COALESCE($5, task_date),
+        status = COALESCE($6, status),
+        updated_at = NOW()
+      WHERE id = $7
+      RETURNING *
+      `,
+      [
+        pond_id,
+        title,
+        description,
+        priority,
+        task_date,
+        status,
+        id,
+      ]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Tâche non trouvée" });
+    }
+
+    res.json({ task: result.rows[0] });
+  } catch (error) {
+    console.error("Erreur modification tâche :", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+};
+
+const deleteTask = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query(
+      "DELETE FROM tasks WHERE id = $1 RETURNING *",
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Tâche non trouvée" });
+    }
+
+    res.json({
+      message: "Tâche supprimée avec succès",
+      task: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Erreur suppression tâche :", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+};
+
+module.exports = {
+  addTask,
+  getTasks,
+  updateTaskStatus,
+  updateTask,
+  deleteTask,
+};
