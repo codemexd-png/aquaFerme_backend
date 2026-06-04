@@ -12,7 +12,8 @@ const pool = require("../config/db");
 
 // Crée une nouvelle tâche dans le planning.
 const addTask = async (req, res) => {
-  const { pond_id, assigned_to, title, description, priority, task_date } = req.body;
+  const { pond_id, assigned_to, title, description, priority, task_date } =
+    req.body;
   const user_id = req.user.id;
 
   // title, priority et task_date sont obligatoires
@@ -36,25 +37,17 @@ const addTask = async (req, res) => {
         description || null,
         priority,
         task_date,
-      ]
+      ],
     );
 
     await pool.query(
-
       `INSERT INTO notifications (user_id, message)
 
       VALUES ($1, $2)`,
 
-      [
-
-        assigned_to || user_id,
-
-        `Nouvelle tâche créée : ${title}`,
-
-      ]
-
+      [assigned_to || user_id, `Nouvelle tâche créée : ${title}`],
     );
- 
+
     res.status(201).json({ task: result.rows[0] });
   } catch (error) {
     console.error("Erreur lors de la création de la tâche :", error);
@@ -87,6 +80,11 @@ const getTasks = async (req, res) => {
     conditions.push(`user_id = $${params.length}`);
   }
 
+  // Si assigned_to est fourni, on ajoute aussi ce filtre
+  if (assigned_to) {
+    params.push(assigned_to);
+    conditions.push(`assigned_to = $${params.length}`);
+  }
   const whereClause =
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
@@ -142,14 +140,7 @@ const updateTaskStatus = async (req, res) => {
 
 const updateTask = async (req, res) => {
   const { id } = req.params;
-  const {
-    pond_id,
-    title,
-    description,
-    priority,
-    task_date,
-    status,
-  } = req.body;
+  const { pond_id, title, description, priority, task_date, status } = req.body;
 
   try {
     const result = await pool.query(
@@ -166,15 +157,7 @@ const updateTask = async (req, res) => {
       WHERE id = $7
       RETURNING *
       `,
-      [
-        pond_id,
-        title,
-        description,
-        priority,
-        task_date,
-        status,
-        id,
-      ]
+      [pond_id, title, description, priority, task_date, status, id],
     );
 
     if (result.rows.length === 0) {
@@ -194,7 +177,7 @@ const deleteTask = async (req, res) => {
   try {
     const result = await pool.query(
       "DELETE FROM tasks WHERE id = $1 RETURNING *",
-      [id]
+      [id],
     );
 
     if (result.rows.length === 0) {
