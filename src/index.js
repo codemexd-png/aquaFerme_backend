@@ -46,12 +46,10 @@ app.use("/ponds", pondRoutes);
 app.use("/feed-stock", feedStockRoutes);
 app.use("/users", usersRoutes);
 app.use("/statistics", statisticsRoutes);
-app.use("/notification", notificationRoutes);
+app.use("/notifications", notificationRoutes);
 
 // On récupère le port depuis .env, ou 3000 par défaut
 const PORT = process.env.PORT || 3000;
-
-
 
 app.get("/", (req, res) => {
   res.send("API AquaTrack fonctionne");
