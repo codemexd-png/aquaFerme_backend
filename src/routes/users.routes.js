@@ -4,7 +4,6 @@ const usersController = require("../controllers/users.controller");
 const verifyToken = require("../middleware/auth.middleware");
 
 router.get("/", verifyToken, usersController.getUsers);
-router.post("/", verifyToken, usersController.createUser);
 router.patch("/:id", verifyToken, usersController.updateUser);
 router.delete("/:id", verifyToken, usersController.deleteUser);
 

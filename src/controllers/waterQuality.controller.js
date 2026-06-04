@@ -23,30 +23,102 @@ const addMeasurement = async (req, res) => {
 };
 
 const getMeasurements = async (req, res) => {
-    const { pond_id } = req.query;
-    try {
-        let query, params;
-        if (pond_id) {
-            query = `SELECT wq.*, p.name AS pond_name
-                     FROM water_quality wq
-                     LEFT JOIN ponds p ON p.id = wq.pond_id
-                     WHERE wq.pond_id = $1
-                     ORDER BY wq.measurement_date DESC, wq.id DESC`;
-            params = [pond_id];
-        } else {
-            query = `SELECT wq.*, p.name AS pond_name
-                     FROM water_quality wq
-                     LEFT JOIN ponds p ON p.id = wq.pond_id
-                     ORDER BY wq.measurement_date DESC, wq.id DESC
-                     LIMIT 500`;
-            params = [];
-        }
-        const result = await pool.query(query, params);
-        res.json({ measurements: result.rows });
-    } catch (error) {
-        console.error('Erreur getMeasurements:', error);
-        res.status(500).json({ error: 'Erreur serveur' });
+  const { pond_id } = req.query;
+
+  try {
+    let result;
+
+    if (pond_id) {
+      result = await pool.query(
+        `SELECT * FROM water_quality 
+         WHERE pond_id = $1 
+         ORDER BY measurement_date DESC`,
+        [pond_id]
+      );
+    } else {
+      result = await pool.query(
+        `SELECT * FROM water_quality 
+         ORDER BY measurement_date DESC`
+      );
     }
+
+    res.json({ measurements: result.rows });
+  } catch (error) {
+    console.error("Erreur lors de la récupération des relevés :", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
 };
 
-module.exports = { addMeasurement, getMeasurements };
+const updateMeasurement = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      pond_id,
+      measurement_date,
+      oxygen_level_mg_l,
+      temperature_c,
+      water_color,
+    } = req.body;
+
+    const result = await pool.query(
+      `
+      UPDATE water_quality
+      SET
+        pond_id = COALESCE($1, pond_id),
+        measurement_date = COALESCE($2, measurement_date),
+        oxygen_level_mg_l = COALESCE($3, oxygen_level_mg_l),
+        temperature_c = COALESCE($4, temperature_c),
+        water_color = COALESCE($5, water_color)
+      WHERE id = $6
+      RETURNING *
+      `,
+      [
+        pond_id,
+        measurement_date,
+        oxygen_level_mg_l,
+        temperature_c,
+        water_color,
+        id,
+      ]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Relevé introuvable" });
+    }
+
+    res.json({ measurement: result.rows[0] });
+  } catch (error) {
+    console.error("Erreur modification relevé :", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+};
+
+const deleteMeasurement = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(
+      "DELETE FROM water_quality WHERE id = $1 RETURNING *",
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Relevé introuvable" });
+    }
+
+    res.json({
+      message: "Relevé supprimé avec succès",
+      measurement: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Erreur suppression relevé :", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+};
+
+module.exports = {
+  addMeasurement,
+  getMeasurements,
+  updateMeasurement,
+  deleteMeasurement,
+};

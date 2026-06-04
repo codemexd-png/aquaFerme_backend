@@ -8,4 +8,8 @@ router.post('/', verifyToken, feedStockController.createStock);
 router.put('/:id', verifyToken, feedStockController.updateStock);
 router.delete('/:id', verifyToken, feedStockController.deleteStock);
 
+router.post("/", verifyToken, feedStockController.createStock);
+router.patch("/:id", verifyToken, feedStockController.updateStockFull);
+router.delete("/:id", verifyToken, feedStockController.deleteStock);
+
 module.exports = router;
