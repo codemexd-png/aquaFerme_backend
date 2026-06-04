@@ -39,6 +39,22 @@ const addTask = async (req, res) => {
       ]
     );
 
+    await pool.query(
+
+      `INSERT INTO notifications (user_id, message)
+
+      VALUES ($1, $2)`,
+
+      [
+
+        assigned_to || user_id,
+
+        `Nouvelle tâche créée : ${title}`,
+
+      ]
+
+    );
+ 
     res.status(201).json({ task: result.rows[0] });
   } catch (error) {
     console.error("Erreur lors de la création de la tâche :", error);

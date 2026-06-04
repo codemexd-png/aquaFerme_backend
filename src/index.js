@@ -20,6 +20,7 @@ const taskRoutes = require("./routes/task.routes");
 const usersRoutes = require("./routes/users.routes");
 const feedStockRoutes = require("./routes/feed_stock.routes");
 const statisticsRoutes = require("./routes/statistics.routes");
+const notificationRoutes = require("./routes/notification.routes");
 
 // On crée l'application Express
 const app = express();
@@ -45,6 +46,7 @@ app.use("/ponds", pondRoutes);
 app.use("/feed-stock", feedStockRoutes);
 app.use("/users", usersRoutes);
 app.use("/statistics", statisticsRoutes);
+app.use("/notification", notificationRoutes);
 
 // On récupère le port depuis .env, ou 3000 par défaut
 const PORT = process.env.PORT || 3000;

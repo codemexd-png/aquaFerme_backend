@@ -7,7 +7,7 @@ const pondController = require("../controllers/pond.controller");
 const verifyToken = require("../middleware/auth.middleware");
 
 router.get("/", verifyToken, pondController.getAllPonds);
-router.get("/dashboard-stats", verifyToken, pondController.getDashboardStats);
+//router.get("/dashboard-stats", verifyToken, pondController.getDashboardStats);
 router.get("/:id", verifyToken, pondController.getPondById);
 router.get("/:id/stats", verifyToken, pondController.getPondStats);
 router.post("/:id/feed", verifyToken, pondController.updateDailyFeed);
