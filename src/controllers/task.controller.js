@@ -63,7 +63,7 @@ const addTask = async (req, res) => {
 //   GET /tasks?date=2026-05-23&user_id=1 → combinaison des deux filtres
 // Résultats triés par date puis priorité.
 const getTasks = async (req, res) => {
-  const { date, user_id } = req.query;
+  const { date, user_id, assigned_to } = req.query;
 
   // On construit la requête dynamiquement pour éviter d'écrire plusieurs versions de la même requête.
   // On ajoute des conditions selon les paramètres reçus.

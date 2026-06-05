@@ -196,7 +196,7 @@ exports.createPond = async (req, res) => {
         ($1, $2, $3, $4, $5)
       RETURNING *
       `,
-      [name, finalGroup, finalArea, finalCapacity, finalFishCount]
+      [name, finalGroup, finalArea, finalCapacity, finalFishCount],
     );
 
     res.status(201).json(result.rows[0]);
@@ -247,7 +247,7 @@ exports.updatePond = async (req, res) => {
         max_capacity || maxCapacity,
         current_fish_count || currentFishCount,
         id,
-      ]
+      ],
     );
 
     if (result.rows.length === 0) {
@@ -275,7 +275,7 @@ exports.deletePond = async (req, res) => {
 
     const result = await pool.query(
       "DELETE FROM ponds WHERE id = $1 RETURNING *",
-      [id]
+      [id],
     );
 
     if (result.rows.length === 0) {
@@ -293,5 +293,35 @@ exports.deletePond = async (req, res) => {
       message: "Erreur suppression étang",
       error: error.message,
     });
+  }
+};
+
+// =========================
+// GET /ponds/dashboard-stats
+// Stats globales pour le dashboard
+// =========================
+exports.getDashboardStats = async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        COALESCE(SUM(current_fish_count), 0)                        AS total_fish,
+        COUNT(*)                                                     AS total_ponds,
+        COUNT(*) FILTER (WHERE current_fish_count > 0)              AS active_ponds,
+        ROUND(
+          AVG(
+            CASE WHEN max_capacity > 0
+              THEN (current_fish_count::float / max_capacity) * 100
+            END
+          )::numeric, 1
+        )                                                            AS avg_occupation,
+        COALESCE(
+          SUM(current_fish_count) FILTER (WHERE pond_group = 'Barrage'), 0
+        )                                                            AS barrage_fish
+      FROM ponds
+    `);
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur", error: error.message });
   }
 };
